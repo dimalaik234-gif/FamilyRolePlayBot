@@ -57,6 +57,56 @@ async def profile_command(message: Message):
     await message.reply(text, parse_mode="HTML")
 
 
+@router.message(Command("stats"))
+async def stats_command(message: Message):
+    """Статистика чата"""
+    if message.chat.type == "private":
+        await message.reply("❌ Эта команда работает только в группах!")
+        return
+    
+    chat_id = message.chat.id
+    
+    async with aiosqlite.connect(DB_PATH) as db:
+        # Всего пользователей
+        async with db.execute(
+            'SELECT COUNT(*) FROM users WHERE chat_id = ?', (chat_id,)
+        ) as cursor:
+            total_users = (await cursor.fetchone())[0]
+        
+        # Всего браков
+        async with db.execute(
+            'SELECT COUNT(*) FROM marriages WHERE chat_id = ?', (chat_id,)
+        ) as cursor:
+            total_marriages = (await cursor.fetchone())[0]
+        
+        # Всего детей
+        async with db.execute(
+            'SELECT COUNT(*) FROM children WHERE chat_id = ?', (chat_id,)
+        ) as cursor:
+            total_children = (await cursor.fetchone())[0]
+        
+        # Пользователи с ролями
+        async with db.execute(
+            'SELECT COUNT(*) FROM users WHERE chat_id = ? AND role IS NOT NULL', (chat_id,)
+        ) as cursor:
+            users_with_roles = (await cursor.fetchone())[0]
+    
+    text = f"""
+╔═══════════════════════╗
+  📊 <b>Статистика чата</b>
+╚═══════════════════════╝
+
+👥 <b>Всего участников:</b> {total_users}
+💑 <b>Браков заключено:</b> {total_marriages}
+👶 <b>Детей усыновлено:</b> {total_children}
+🎭 <b>Пользователей с ролями:</b> {users_with_roles}
+
+━━━━━━━━━━━━━━━━━━━━━
+💡 <i>Статистика обновляется в реальном времени</i>
+    """
+    
+    await message.reply(text.strip(), parse_mode="HTML")
+
 @router.message(Command("help"))
 async def help_command(message: Message):
     """Команда /help - список команд"""
