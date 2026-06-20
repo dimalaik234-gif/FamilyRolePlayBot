@@ -2,9 +2,12 @@ from aiogram import Router, F
 from aiogram.types import Message, CallbackQuery
 from aiogram.filters import Command
 from database import register_user, set_role
-from keyboards import get_roles_keyboard
+# ИЗМЕНЕНО: прямой импорт из keyboards.inline
+from keyboards.inline import get_roles_keyboard
 
 router = Router()
+
+# ... остальной код без изменений
 
 
 @router.message(Command("setrole"))
