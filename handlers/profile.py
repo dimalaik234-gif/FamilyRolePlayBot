@@ -27,21 +27,32 @@ async def profile_command(message: Message):
     reg_date = datetime.fromisoformat(user['registered_at']).strftime("%d.%m.%Y")
     
     # Формируем текст
-    text = f"👤 <b>Профиль: {user['first_name']}</b>\n\n"
+    text = f"╔═══════════════════╗\n"
+    text += f"👤 <b>{user['first_name']}</b>\n"
+    text += f"╚═══════════════════╝\n\n"
     
     if user['role']:
         text += f"🎭 <b>Роль:</b> {user['role']}\n\n"
     
+    text += "━━━━━━━━━━━━━━━━━━━\n\n"
+    
     if partner:
-        text += f"💑 <b>Партнёр:</b> {partner['first_name']}\n"
+        partner_role = f" ({partner['role']})" if partner['role'] else ""
+        text += f"💑 <b>Партнёр:</b> {partner['first_name']}{partner_role}\n"
+    else:
+        text += f"💑 <b>Партнёр:</b> <i>свободен</i>\n"
     
     if children:
         text += f"👶 <b>Детей:</b> {len(children)}\n"
+    else:
+        text += f"👶 <b>Детей:</b> <i>нет</i>\n"
     
     if parents:
         text += f"👨 <b>Родителей:</b> {len(parents)}\n"
+    else:
+        text += f"👨 <b>Родителей:</b> <i>нет</i>\n"
     
-    text += f"\n📅 <b>Зарегистрирован:</b> {reg_date}"
+    text += f"\n📅 <b>В семейке с:</b> {reg_date}"
     
     await message.reply(text, parse_mode="HTML")
 
@@ -50,25 +61,29 @@ async def profile_command(message: Message):
 async def help_command(message: Message):
     """Команда /help - список команд"""
     text = """
-📖 <b>Список команд бота:</b>
+╔═══════════════════════╗
+  📖 <b>Family RP Bot</b>
+╚═══════════════════════╝
 
-<b>💍 Брак:</b>
+<b>💍 БРАК:</b>
 /marry — предложить брак (реплаем)
 /divorce — развестись
 
-<b>👨‍👩‍👧‍👦 Семья:</b>
+<b>👨‍👩‍👧‍👦 СЕМЬЯ:</b>
 /adopt — усыновить (реплаем)
 /disown — отказаться от ребёнка (реплаем)
 /family — показать дерево семьи
 
-<b>🎭 Роли:</b>
+<b>🎭 РОЛИ:</b>
 /setrole — выбрать роль
+<i>Доступны: Лупа, Пупа, Залупа, Залупомэн</i>
 
-<b>👤 Профиль:</b>
+<b>👤 ПРОФИЛЬ:</b>
 /profile — показать профиль
-
-<b>📖 Помощь:</b>
 /help — список команд
+
+━━━━━━━━━━━━━━━━━━━━━
+💡 <i>Все команды работают в групповых чатах!</i>
     """
     await message.reply(text.strip(), parse_mode="HTML")
 
@@ -76,4 +91,19 @@ async def help_command(message: Message):
 @router.message(Command("start"))
 async def start_command(message: Message):
     """Команда /start"""
-    await help_command(message)
+    if message.chat.type == "private":
+        text = """
+👋 <b>Привет! Я Family RP Bot!</b>
+
+Добавь меня в групповой чат, чтобы:
+💍 Жениться на друзьях
+👶 Усыновлять участников
+🎭 Выбирать прикольные роли
+👨‍👩‍👧‍👦 Строить семейное древо
+
+━━━━━━━━━━━━━━━━━━━━━
+📖 Используй /help для списка команд
+        """
+        await message.reply(text.strip(), parse_mode="HTML")
+    else:
+        await help_command(message)
