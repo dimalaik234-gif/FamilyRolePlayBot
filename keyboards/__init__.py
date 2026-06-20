@@ -1,4 +1,4 @@
-from .inline import (
+from keyboards.inline import (
     get_marry_keyboard,
     get_divorce_keyboard,
     get_adopt_keyboard,
