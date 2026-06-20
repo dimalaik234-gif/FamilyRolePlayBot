@@ -5,9 +5,12 @@ from database import (
     register_user, get_partner, create_marriage, 
     delete_marriage, get_children
 )
-from keyboards import get_marry_keyboard, get_divorce_keyboard
+# ИЗМЕНЕНО: прямой импорт из keyboards.inline
+from keyboards.inline import get_marry_keyboard, get_divorce_keyboard
 
 router = Router()
+
+# ... остальной код без изменений
 
 
 @router.message(Command("marry"))
